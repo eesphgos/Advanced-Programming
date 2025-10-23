@@ -1,0 +1,195 @@
+//403521033
+using System;
+using System.Net.Http.Headers;
+enum type
+{
+    Work,
+    School,
+    Friend,
+    Family,
+    Other,
+}
+class User
+{
+    public string name;
+    public string famil;
+    public string num;
+    public List<contact> contacts;
+}
+class contact
+{
+    public string name;
+    public string famil;
+    public string num;
+    public type a;
+
+}
+static class contactmanager
+{
+    static List<User> total = new List<User>();
+    public static User GetUserInfo(string nam ,string last,string number)
+    {
+
+
+        char[] namee = nam.ToCharArray();
+        char[] laste = last.ToCharArray();
+        char[] numb = number.ToCharArray();
+
+        try
+        {
+            if(namee.Length<2 || namee.Length>30 || laste.Length <2 || laste.Length>50 || numb.Length!=11 || numb[0]!='0' || numb[1]!= '9')
+            {
+                throw new Exception();
+            }
+            for(int i = 0; i < namee.Length; i++)
+            {
+                if (!char.IsLetter(namee[i]))
+                {
+                    throw new Exception();
+                }
+            }
+            for (int i = 0; i < laste.Length; i++)
+            {
+                if (!char.IsLetter(laste[i]))
+                {
+                    throw new Exception();
+                }
+            }
+            string[] totall = File.ReadAllLines("users.txt");
+            foreach(string i in totall)
+            {
+                if (i == number) { throw new Exception(); }
+            }
+        }
+        catch
+        {
+            Console.WriteLine("wrong entry");
+        }
+        User a = new User();
+        a.name = nam;
+        a.famil = last;
+        a.num = number;
+        return a;
+    }
+
+    public static bool SaveUser(User user)
+    {
+
+        File.AppendAllText("users.txt",$"firstname: {user.name}\n");
+        File.AppendAllText("users.txt",$"lastname: {user.famil}\n");
+        File.AppendAllText("users.txt",$"phonenumber: {user.num} \n");
+        File.AppendAllText("users.txt",$"contacts:\n");
+        
+
+        return true;
+    }
+
+    public static User RetrieveUserInfo(string phonenumber)
+    {
+        string[] file = File.ReadAllLines("users.txt");
+        User aaa = new User();
+        bool ad = true;
+        try
+        {
+           for(int i = 0; i < file.Length; i++)
+            {
+                if (file[i] == phonenumber)
+                {
+                    ad = false;
+                    aaa.name = file[i - 2];
+                    aaa.famil = file[i - 1];
+                    aaa.num = file[i];
+                    char[] a = file[i].ToCharArray();
+                    while (a[0] == ' ')
+                    {
+                        i++;
+                        a = file[i].ToCharArray();
+                        if (a[0]==' ')
+                        {
+                            contact b = new contact();
+                            b.name = file[i];
+                            b.famil = file[i + 1];
+                            b.num = file[i + 2];
+                            if (file[i+3] == "Work") { b.a = type.Work; }
+                            if (file[i+3] == "School") { b.a = type.School;}
+                            if (file[i+3] == "Friend") { b.a = type.Friend; }
+                            if (file[i+3] == "Family") { b.a = type.Family; }
+                            if (file[i+3] == "Other") { b.a = type.Other; }
+                            i += 3;
+                            aaa.contacts.Add(b);
+                        }
+                    }
+                }
+            }
+            if (!ad) { throw new Exception(); }
+        }
+        catch
+        {
+            Console.WriteLine("not found");
+        }
+        return aaa;
+    }
+
+    public static void PrintUserInfo(User user)
+    {
+        Console.WriteLine($"{user.name}");
+        Console.WriteLine($"{user.famil}");
+        Console.WriteLine($"{user.num}");
+        for(int i = 0; i < user.contacts.Count; i++)
+        {
+            Console.WriteLine($"{user.contacts[i].name}");
+            Console.WriteLine($"{user.contacts[i].famil}");
+            Console.WriteLine($"{user.contacts[i].num}");
+            Console.WriteLine($"{user.contacts[i].a}");
+        }
+    }
+
+    public static contact GetContactInfo()
+    {
+        contact ttt = new contact();
+        Console.WriteLine("enter number");
+        string num = Console.ReadLine();
+        string[] filee = File.ReadAllLines("users.txt");
+        for(int i=0;i<filee.Length;i++)
+        {
+            if (filee[i] == num)
+            {
+                ttt.name = filee[i - 2];
+                ttt.famil = filee[i - 1];
+                ttt.num = filee[i];
+
+            }
+        }
+        Console.WriteLine("enter type or number to type");
+        Console.WriteLine("1Work");
+        Console.WriteLine("2School");
+        Console.WriteLine("3Friend");
+        Console.WriteLine("4Family");
+        Console.WriteLine("5Other");
+        string s =Console.ReadLine();
+
+        if (s == "1") { ttt.a = type.Work;return ttt; }
+        if (s == "2") { ttt.a = type.School; return ttt; }
+        if (s == "3") { ttt.a = type.Friend; return ttt; }
+        if (s == "4") { ttt.a = type.Family; return ttt; }
+        if (s == "5") { ttt.a = type.Other; return ttt; }
+        if (s == "Work") { ttt.a = type.Work; return ttt; }
+        if (s == "School") { ttt.a = type.School; return ttt; }
+        if (s == "Friend") { ttt.a = type.Friend; return ttt; }
+        if (s == "Family") { ttt.a = type.Family; return ttt; }
+        if (s == "Other") { ttt.a = type.Other; return ttt; }
+        try { throw new Exception(); }
+        catch { Console.WriteLine("wrong"); }
+        return ttt;
+    }
+
+
+
+    static void Main()
+    {
+        SaveUser(GetUserInfo("aa","aaaa","09133456789"));
+        SaveUser(GetUserInfo("afsd","agasdsaaaa","09123456789"));
+        SaveUser(GetUserInfo("adda","aagsddsgwfafgrgaa","09143456789"));
+
+    }
+}
